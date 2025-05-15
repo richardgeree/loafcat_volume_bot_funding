@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>*** LOAFCAT Whale Verifier ***</title>
+</head>
+<body>
+  <h2>Hello LOAFIE! Verify You Hold 250M+ LOAFCAT.</h2>
+  <button onclick="connectWallet()">Connect Phantom</button>
+  <div id="result"></div>
+
+  <script type="module">
+    import {
+      Connection,
+      PublicKey
+    } from "https://cdn.skypack.dev/@solana/web3.js";
+
+    const TOKEN_MINT = new PublicKey("LoafdJ3WSAvsrx3zppSGKA6sRvL9GrRrU1iRV7HkLkm"); // Replace
+    const RPC_ENDPOINT = "https://api.mainnet-beta.solana.com";
+    const MIN_BALANCE = 250_000_000; // adjust decimals if needed
+
+    async function connectWallet() {
+      const provider = window?.phantom?.solana;
+      if (!provider?.isPhantom) {
+        alert("Phantom not found.");
+        return;
+      }
+
+      const resp = await provider.connect();
+      const walletAddress = resp.publicKey.toString();
+      document.getElementById("result").innerText = "Connected: " + walletAddress;
+
+      const connection = new Connection(RPC_ENDPOINT);
+      const accounts = await connection.getParsedTokenAccountsByOwner(
+        resp.publicKey,
+        { programId: new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA") }
+      );
+
+      const match = accounts.value.find(acc =>
+        acc.account.data.parsed.info.mint === TOKEN_MINT.toString()
+      );
+
+      const balance = match ? match.account.data.parsed.info.tokenAmount.uiAmount : 0;
+
+      if (balance >= MIN_BALANCE) {
+        document.getElementById("result").innerText += "\n✅ You are a LOAFCAT whale!";
+        // Optional: fetch Telegram link from your bot here
+      } else {
+        document.getElementById("result").innerText += "\n❌ You need at least 250M LOAFCAT.";
+      }
+    }
+  </script>
+</body>
+</html>
