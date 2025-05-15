@@ -3,16 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Connect Phantom</title>
+  <title>LOAFCAT Whale Checker</title>
 </head>
 <body>
   <h1>LOAFCAT Whale Checker 🐳</h1>
   <button id="connect-button">Connect Phantom Wallet</button>
   <p id="status"></p>
 
-  <script>
+  <script type="module">
+    import {
+      Connection,
+      clusterApiUrl,
+      PublicKey
+    } from "https://cdn.jsdelivr.net/npm/@solana/web3.js@1.78.2/+esm";
+
     const connectButton = document.getElementById('connect-button');
     const statusText = document.getElementById('status');
+
+    const LOAFCAT_MINT = new PublicKey("LoafdJ3WSAvsrx3zppSGKA6sRvL9GrRrU1iRV7HkLkm");
+    const MIN_BALANCE = 250_000_000;
 
     connectButton.addEventListener('click', async () => {
       if (!window?.phantom?.solana?.isPhantom) {
@@ -22,14 +31,47 @@
 
       try {
         const resp = await window.phantom.solana.connect();
-        const publicKey = resp.publicKey.toString();
-        statusText.innerText = `✅ Connected wallet: ${publicKey}`;
+        const walletAddress = resp.publicKey.toString();
+        statusText.innerText = `🔗 Connected: ${walletAddress}`;
 
-        // 🔽 Fetch and check LOAFCAT balance logic would go here
+        // Setup Solana connection
+        const connection = new Connection(clusterApiUrl("mainnet-beta"));
+
+        // Get all token accounts owned by wallet
+        const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+          resp.publicKey,
+          { programId: new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA") }
+        );
+
+        let found = false;
+
+        for (let account of tokenAccounts.value) {
+          const info = account.account.data.parsed.info;
+          const mint = info.mint;
+          const amount = Number(info.tokenAmount.amount);
+          const decimals = info.tokenAmount.decimals;
+
+          if (mint === LOAFCAT_MINT.toBase58()) {
+            const realAmount = amount / Math.pow(10, decimals);
+
+            if (realAmount >= MIN_BALANCE) {
+              statusText.innerText += `\n✅ You are a whale! (${realAmount} LOAFCAT)`;
+              found = true;
+            } else {
+              statusText.innerText += `\n❌ Not enough LOAFCAT (${realAmount})`;
+              found = true;
+            }
+            break;
+          }
+        }
+
+        if (!found) {
+          statusText.innerText += `\n❌ You do not hold any LOAFCAT tokens.`;
+        }
 
       } catch (err) {
         console.error(err);
-        statusText.innerText = '❌ Wallet connection failed';
+        statusText.innerText = '❌ Wallet connection or balance check failed.';
       }
     });
   </script>
