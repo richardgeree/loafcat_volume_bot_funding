@@ -144,7 +144,7 @@
     <h1>LOAFCAT Whale Checker 🐳</h1>
     <p class="subtitle">
       Verify your LOAFCAT holdings anonymously.<br />
-      Connect your Phantom wallet to confirm you hold at least 250M LOAFCAT tokens.
+      Connect your Phantom wallet to confirm you hold at least 250M LOAFCAT tokens and get a private invite link for Telegram group.
     </p>
 
     <button id="connect-button">Connect Phantom Wallet</button>
@@ -157,10 +157,6 @@
   </main>
 
   <footer>
-    <strong>LOAFCAT Vision:</strong> A Legacy of Joy<br />
-    LOAFCAT is a beloved meme token on Solana that started as a 20-year-old internet cat meme and evolved into a thriving ecosystem.<br />
-    With a play-to-earn Telegram game and now a powerful DeFi layer via LoafBank, LOAFCAT is bridging memes with real financial utility.<br /><br />
-
     © 2025 LoafCat Studios. All rights reserved.<br />
     This document is for informational purposes only and does not constitute investment advice, an offer, or a solicitation to buy or sell any financial instrument.<br />
     Participation in digital assets involves significant risk. Past performance is not indicative of future results.<br />
@@ -214,15 +210,15 @@
         });
 
         if (!found) {
-          statusText.textContent = "❌ Step into the bakery and grab your first loaf — the freshest bread and warmest paws await!";
+          statusText.textContent = "❌ You currently hold 0 LOAFCAT.\nStep into the bakery and grab your first loaf — the freshest bread and warmest paws await!";
           return;
         }
 
         if (amount >= MIN_BALANCE) {
-          statusText.textContent = "🐾 Welcome to the LOAFCAT Whales! 🐳🍞 You’re the freshest loaf in our bakery — together we rise mighty and unstoppable!";
+          statusText.textContent = `🐾 Welcome to the LOAFCAT Whales! 🐳🍞 You’re the freshest loaf in our bakery — together we rise mighty and unstoppable!\nYour LOAFCAT balance: ${amount.toLocaleString()}`;
           tgLink.style.display = "inline-block";
         } else {
-          statusText.textContent = "🫶 Keep kneading! Your loaf’s almost baked — 250M LOAFCAT is just ahead, and the bakery grows stronger with you.";
+          statusText.textContent = `🫶 Keep kneading! Your loaf’s almost baked — 250M LOAFCAT is just ahead, and the bakery grows stronger with you.\nYour current balance: ${amount.toLocaleString()}`;
         }
 
       } catch (err) {
