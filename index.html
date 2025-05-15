@@ -1,77 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LOAFCAT Whale Checker</title>
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
 </head>
 <body>
   <h1>LOAFCAT Whale Checker 🐳</h1>
   <button id="connect-button">Connect Phantom Wallet</button>
   <p id="status"></p>
 
-  <script type="module">
-    import {
-      Connection,
-      clusterApiUrl,
-      PublicKey
-    } from "https://cdn.jsdelivr.net/npm/@solana/web3.js@1.78.2/+esm";
-
+  <script>
     const connectButton = document.getElementById('connect-button');
     const statusText = document.getElementById('status');
 
-    const LOAFCAT_MINT = new PublicKey("LoafdJ3WSAvsrx3zppSGKA6sRvL9GrRrU1iRV7HkLkm");
+    const LOAFCAT_MINT = "LoafdJ3WSAvsrx3zppSGKA6sRvL9GrRrU1iRV7HkLkm";  // 👈 Replace this
     const MIN_BALANCE = 250_000_000;
 
     connectButton.addEventListener('click', async () => {
-      if (!window?.phantom?.solana?.isPhantom) {
-        alert('Phantom Wallet not detected. Please install it from https://phantom.app');
+      const provider = window?.phantom?.solana;
+      if (!provider?.isPhantom) {
+        alert("Phantom Wallet not found. Install it from https://phantom.app");
         return;
       }
 
       try {
-        const resp = await window.phantom.solana.connect();
-        const walletAddress = resp.publicKey.toString();
-        statusText.innerText = `🔗 Connected: ${walletAddress}`;
+        const resp = await provider.connect();
+        const publicKey = resp.publicKey.toString();
+        statusText.innerText = `🔗 Connected: ${publicKey}`;
 
-        // Setup Solana connection
-        const connection = new Connection(clusterApiUrl("mainnet-beta"));
+        const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl("mainnet-beta"));
 
-        // Get all token accounts owned by wallet
         const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
           resp.publicKey,
-          { programId: new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA") }
+          { programId: new solanaWeb3.PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA") }
         );
 
         let found = false;
 
-        for (let account of tokenAccounts.value) {
-          const info = account.account.data.parsed.info;
+        tokenAccounts.value.forEach(({ account }) => {
+          const info = account.data.parsed.info;
           const mint = info.mint;
-          const amount = Number(info.tokenAmount.amount);
+          const rawAmount = info.tokenAmount.amount;
           const decimals = info.tokenAmount.decimals;
+          const balance = rawAmount / Math.pow(10, decimals);
 
-          if (mint === LOAFCAT_MINT.toBase58()) {
-            const realAmount = amount / Math.pow(10, decimals);
-
-            if (realAmount >= MIN_BALANCE) {
-              statusText.innerText += `\n✅ You are a whale! (${realAmount} LOAFCAT)`;
-              found = true;
+          if (mint === LOAFCAT_MINT) {
+            found = true;
+            if (balance >= MIN_BALANCE) {
+              statusText.innerText += `\n✅ You are a whale! (${balance} LOAFCAT)`;
             } else {
-              statusText.innerText += `\n❌ Not enough LOAFCAT (${realAmount})`;
-              found = true;
+              statusText.innerText += `\n❌ Not enough LOAFCAT (${balance})`;
             }
-            break;
           }
-        }
+        });
 
         if (!found) {
-          statusText.innerText += `\n❌ You do not hold any LOAFCAT tokens.`;
+          statusText.innerText += `\n❌ You don't hold any LOAFCAT tokens.`;
         }
 
       } catch (err) {
-        console.error(err);
-        statusText.innerText = '❌ Wallet connection or balance check failed.';
+        console.error("Wallet connection error:", err);
+        statusText.innerText = "❌ Failed to connect wallet.";
       }
     });
   </script>
