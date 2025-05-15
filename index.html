@@ -31,8 +31,9 @@
         const publicKey = resp.publicKey.toString();
         statusText.textContent = `🔗 Connected: ${publicKey}\nChecking LOAFCAT balance...`;
 
+        // Your QuickNode RPC URL here:
         const connection = new solanaWeb3.Connection(
-          "https://api.mainnet.solana.com",
+          "https://bold-shy-bush.solana-mainnet.quiknode.pro/12de2fb6da10bb23321dea265062809717f23e54/",
           "confirmed"
         );
 
