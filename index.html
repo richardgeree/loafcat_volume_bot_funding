@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LOAFCAT Whale Checker</title>
   <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
 </head>
@@ -12,28 +11,36 @@
   <p id="status"></p>
 
   <script>
-    const connectButton = document.getElementById('connect-button');
-    const statusText = document.getElementById('status');
+    const connectButton = document.getElementById("connect-button");
+    const statusText = document.getElementById("status");
 
-    const LOAFCAT_MINT = "LoafdJ3WSAvsrx3zppSGKA6sRvL9GrRrU1iRV7HkLkm";  // 👈 Replace this
+    // Replace this with your real LOAFCAT token mint address
+    const LOAFCAT_MINT = "LoafdJ3WSAvsrx3zppSGKA6sRvL9GrRrU1iRV7HkLkm";
     const MIN_BALANCE = 250_000_000;
 
-    connectButton.addEventListener('click', async () => {
-      const provider = window?.phantom?.solana;
-      if (!provider?.isPhantom) {
-        alert("Phantom Wallet not found. Install it from https://phantom.app");
+    connectButton.addEventListener("click", async () => {
+      const provider = window.solana;
+
+      if (!provider || !provider.isPhantom) {
+        alert("Phantom Wallet not found. Please install it from https://phantom.app");
         return;
       }
 
       try {
+        // ✅ Connect to wallet
         const resp = await provider.connect();
         const publicKey = resp.publicKey.toString();
         statusText.innerText = `🔗 Connected: ${publicKey}`;
 
-        const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl("mainnet-beta"));
+        // ✅ Connect to Solana RPC
+        const connection = new solanaWeb3.Connection(
+          solanaWeb3.clusterApiUrl("mainnet-beta"),
+          "confirmed"
+        );
 
+        // ✅ Get all token accounts
         const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
-          resp.publicKey,
+          new solanaWeb3.PublicKey(publicKey),
           { programId: new solanaWeb3.PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA") }
         );
 
@@ -42,27 +49,27 @@
         tokenAccounts.value.forEach(({ account }) => {
           const info = account.data.parsed.info;
           const mint = info.mint;
-          const rawAmount = info.tokenAmount.amount;
+          const amountRaw = info.tokenAmount.amount;
           const decimals = info.tokenAmount.decimals;
-          const balance = rawAmount / Math.pow(10, decimals);
+          const amount = amountRaw / Math.pow(10, decimals);
 
           if (mint === LOAFCAT_MINT) {
             found = true;
-            if (balance >= MIN_BALANCE) {
-              statusText.innerText += `\n✅ You are a whale! (${balance} LOAFCAT)`;
+            if (amount >= MIN_BALANCE) {
+              statusText.innerText += `\n✅ You are a whale! (${amount} LOAFCAT)`;
             } else {
-              statusText.innerText += `\n❌ Not enough LOAFCAT (${balance})`;
+              statusText.innerText += `\n❌ Not enough LOAFCAT (${amount})`;
             }
           }
         });
 
         if (!found) {
-          statusText.innerText += `\n❌ You don't hold any LOAFCAT tokens.`;
+          statusText.innerText += "\n❌ You do not hold any LOAFCAT tokens.";
         }
 
       } catch (err) {
-        console.error("Wallet connection error:", err);
-        statusText.innerText = "❌ Failed to connect wallet.";
+        console.error("💥 Error after wallet connection:", err);
+        statusText.innerText = "❌ Something went wrong after connecting.";
       }
     });
   </script>
