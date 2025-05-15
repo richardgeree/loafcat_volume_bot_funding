@@ -1,20 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>LOAFCAT Whale Checker</title>
   <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
 </head>
 <body>
   <h1>LOAFCAT Whale Checker 🐳</h1>
   <button id="connect-button">Connect Phantom Wallet</button>
-  <p id="status"></p>
+  <pre id="status" style="white-space: pre-wrap;"></pre>
 
   <script>
     const connectButton = document.getElementById("connect-button");
     const statusText = document.getElementById("status");
 
-    // Replace this with your real LOAFCAT token mint address
     const LOAFCAT_MINT = "LoafdJ3WSAvsrx3zppSGKA6sRvL9GrRrU1iRV7HkLkm";
     const MIN_BALANCE = 250_000_000;
 
@@ -27,22 +26,21 @@
       }
 
       try {
-        // ✅ Connect to wallet
+        statusText.textContent = "Connecting to wallet...";
         const resp = await provider.connect();
         const publicKey = resp.publicKey.toString();
-        statusText.innerText = `🔗 Connected: ${publicKey}`;
+        statusText.textContent = `🔗 Connected: ${publicKey}\nChecking LOAFCAT balance...`;
 
-        // ✅ Connect to Solana RPC
         const connection = new solanaWeb3.Connection(
-          solanaWeb3.clusterApiUrl("https://api.mainnet-beta.solana.com"),
+          "https://api.mainnet-beta.solana.com",
           "confirmed"
         );
 
-        // ✅ Get all token accounts
         const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
           new solanaWeb3.PublicKey(publicKey),
           { programId: new solanaWeb3.PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA") }
         );
+        console.log("Token accounts:", tokenAccounts);
 
         let found = false;
 
@@ -56,20 +54,19 @@
           if (mint === LOAFCAT_MINT) {
             found = true;
             if (amount >= MIN_BALANCE) {
-              statusText.innerText += `\n✅ You are a whale! (${amount} LOAFCAT)`;
+              statusText.textContent += `\n✅ You are a whale! (${amount.toLocaleString()} LOAFCAT)`;
             } else {
-              statusText.innerText += `\n❌ Not enough LOAFCAT (${amount})`;
+              statusText.textContent += `\n❌ Not enough LOAFCAT (${amount.toLocaleString()})`;
             }
           }
         });
 
         if (!found) {
-          statusText.innerText += "\n❌ You do not hold any LOAFCAT tokens.";
+          statusText.textContent += "\n❌ You do not hold any LOAFCAT tokens.";
         }
-
       } catch (err) {
         console.error("💥 Error after wallet connection:", err);
-        statusText.innerText = "❌ Something went wrong after connecting.";
+        statusText.textContent = `❌ Something went wrong after connecting:\n${err.message || err}`;
       }
     });
   </script>
