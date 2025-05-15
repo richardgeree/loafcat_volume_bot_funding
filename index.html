@@ -31,8 +31,9 @@
         const publicKey = resp.publicKey.toString();
         statusText.textContent = `🔗 Connected: ${publicKey}\nChecking LOAFCAT balance...`;
 
+        // Use RPC endpoint with better CORS support
         const connection = new solanaWeb3.Connection(
-          "https://solana-api.projectserum.com",
+          "https://api.mainnet.rpcpool.com",
           "confirmed"
         );
 
