@@ -152,9 +152,10 @@
     <pre id="status" aria-live="polite" role="status" style="white-space: normal;"></pre>
 
     <!-- Telegram link appears here if whale -->
-    <a id="tg-link" href="https://t.me/tobinbellsaw" target="_blank" rel="noopener noreferrer" style="display:none;">
-      Share your unique LOAFCAT Whale code with Tobin on Telegram to enter the bakery lounge! 🥖🐳
-    </a>
+   <a id="tg-link" href="https://t.me/tobinbellsaw" target="_blank" rel="noopener noreferrer" style="display:none;">
+  Send your unique verification code above to Tobin on Telegram and enjoy the ride! 🎉
+</a>
+
   </main>
 
   <footer>
@@ -224,12 +225,16 @@
           return;
         }
 
-        if (amount >= MIN_BALANCE) {
-          const code = generateCodeFromWallet(publicKey);
+if (amount >= MIN_BALANCE) {
+  const code = generateCode(publicKey);
   statusText.innerHTML = `🐾 Welcome to the LOAFCAT Whales! 🐳🍞 You’re the freshest loaf in our bakery — together we rise mighty and unstoppable!<br><br>
-<strong>Your LOAFCAT Whale Code:</strong><br>
-<code style="font-size: 1.1rem; background: #fff2b2; padding: 6px 12px; border-radius: 6px; display: inline-block; margin-top: 0.3rem;">${code}</code><br><br>
-Your LOAFCAT balance: ${amount.toLocaleString()}`;
+  <strong>Your <span style="color:#c08c00;">LOAFCAT Whale Code</span>:</strong><br>
+  <code style="font-size: 1.1rem; background: #fff2b2; padding: 6px 12px; border-radius: 6px; display: inline-block; margin-top: 0.3rem;">${code}</code><br><br>
+  Your LOAFCAT balance: ${amount.toLocaleString()}`;
+
+  tgLink.style.display = "inline-block"; // 🔥 THIS LINE is what shows the button
+}
+
 
         } else {
           statusText.textContent = `🫶 Keep kneading! Your loaf’s almost baked — 250M LOAFCAT is just ahead, and the bakery grows stronger with you.\nYour current balance: ${amount.toLocaleString()}`;
