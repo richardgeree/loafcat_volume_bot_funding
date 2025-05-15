@@ -5,7 +5,6 @@
   <title>LOAFCAT Whale Checker</title>
   <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
   <style>
-    /* Reset */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -32,7 +31,6 @@
       text-align: center;
     }
 
-    /* Logo */
     img#logo {
       display: block;
       margin: 0 auto 1rem auto;
@@ -88,7 +86,25 @@
       box-shadow: inset 0 0 5px #f4c04baa;
       user-select: text;
       max-width: 100%;
-      margin: 0 auto;
+      margin: 0 auto 1rem auto;
+    }
+
+    a#tg-link {
+      display: inline-block;
+      background-color: #f4c04b;
+      color: #3e2e00;
+      text-decoration: none;
+      padding: 0.8rem 1.8rem;
+      border-radius: 8px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      box-shadow: 0 4px 12px rgba(244, 192, 75, 0.5);
+      transition: background-color 0.3s ease;
+      margin-top: 0.5rem;
+    }
+
+    a#tg-link:hover {
+      background-color: #d9a722;
     }
 
     footer {
@@ -133,6 +149,11 @@
 
     <button id="connect-button">Connect Phantom Wallet</button>
     <pre id="status" aria-live="polite" role="status"></pre>
+
+    <!-- Telegram link appears here if whale -->
+    <a id="tg-link" href="https://t.me/+3WLJNmk6QfM1MmM0" target="_blank" rel="noopener noreferrer" style="display:none;">
+      Join the LOAFCAT Whales Telegram Group
+    </a>
   </main>
 
   <footer>
@@ -151,11 +172,13 @@
   <script>
     const connectButton = document.getElementById("connect-button");
     const statusText = document.getElementById("status");
+    const tgLink = document.getElementById("tg-link");
 
     const LOAFCAT_MINT = "LoafdJ3WSAvsrx3zppSGKA6sRvL9GrRrU1iRV7HkLkm";
     const MIN_BALANCE = 250_000_000;
 
     connectButton.addEventListener("click", async () => {
+      tgLink.style.display = "none"; // hide telegram link by default
       const provider = window.solana;
 
       if (!provider || !provider.isPhantom) {
@@ -180,27 +203,28 @@
         );
 
         let found = false;
+        let amount = 0;
 
         tokenAccounts.value.forEach(({ account }) => {
           const info = account.data.parsed.info;
-          const mint = info.mint;
-          const amountRaw = info.tokenAmount.amount;
-          const decimals = info.tokenAmount.decimals;
-          const amount = amountRaw / Math.pow(10, decimals);
-
-          if (mint === LOAFCAT_MINT) {
+          if (info.mint === LOAFCAT_MINT) {
             found = true;
-            if (amount >= MIN_BALANCE) {
-              statusText.textContent += `\n✅ You are a whale! (${amount.toLocaleString()} LOAFCAT)`;
-            } else {
-              statusText.textContent += `\n❌ Not enough LOAFCAT (${amount.toLocaleString()})`;
-            }
+            amount = info.tokenAmount.amount / Math.pow(10, info.tokenAmount.decimals);
           }
         });
 
         if (!found) {
-          statusText.textContent += "\n❌ You do not hold any LOAFCAT tokens.";
+          statusText.textContent = "❌ Step into the bakery and grab your first loaf — the freshest bread and warmest paws await!";
+          return;
         }
+
+        if (amount >= MIN_BALANCE) {
+          statusText.textContent = "🐾 Welcome to the LOAFCAT Whales! 🐳🍞 You’re the freshest loaf in our bakery — together we rise mighty and unstoppable!";
+          tgLink.style.display = "inline-block";
+        } else {
+          statusText.textContent = "🫶 Keep kneading! Your loaf’s almost baked — 250M LOAFCAT is just ahead, and the bakery grows stronger with you.";
+        }
+
       } catch (err) {
         console.error("💥 Error after wallet connection:", err);
         statusText.textContent = `❌ Something went wrong after connecting:\n${err.message || err}`;
