@@ -2,89 +2,86 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>LOAFCAT Bot Checker</title>
+  <title>LOAFCAT Volume Bot Package Checker 🤖</title>
   <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #fef6dc, #f9f1d3);
-      color: #6b5b1a;
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      text-align: center;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(ellipse at center, #2c2c2c 0%, #1a1a1a 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: #f4c04b;
     }
 
     main {
-      max-width: 600px;
+      max-width: 480px;
+      background: #1e1e1e;
       margin: 2rem auto;
-      background: #ffffffcc;
       padding: 2rem 2.5rem;
       border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(244, 192, 75, 0.3);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      text-align: center;
     }
 
     img#logo {
       display: block;
-      margin: 0 auto 1rem;
+      margin: 0 auto 1rem auto;
       width: 150px;
+      height: auto;
     }
 
     h1 {
-      font-size: 2.2rem;
+      font-size: 2rem;
       margin-bottom: 1rem;
       color: #f4c04b;
-      text-shadow: 0 1px 3px rgba(180, 140, 10, 0.7);
+      text-shadow: 0 1px 3px rgba(255, 255, 255, 0.2);
     }
 
-    button {
+    button#check-button {
       background-color: #f4c04b;
       color: #3e2e00;
       border: none;
       border-radius: 8px;
       padding: 1rem 2rem;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       cursor: pointer;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      margin-bottom: 1.5rem;
+      transition: background-color 0.3s ease;
       box-shadow: 0 4px 12px rgba(244, 192, 75, 0.5);
+      margin: 1.5rem 0;
+      font-weight: 700;
+      width: 100%;
+      max-width: 320px;
     }
 
-    button:hover {
+    button#check-button:hover {
       background-color: #d9a722;
     }
 
-    img.centered {
-      display: block;
-      margin: 1rem auto 2rem;
-      max-width: 100%;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-
-    pre {
-      background: #fff8d1;
+    pre#status {
+      background: #2a2a2a;
       padding: 1rem;
-      border-radius: 12px;
-      font-size: 0.95rem;
-      text-align: left;
+      border-radius: 10px;
+      color: #fef6dc;
+      font-size: 1rem;
       white-space: pre-wrap;
-      box-shadow: inset 0 0 5px #f4c04baa;
-      user-select: text;
+      box-shadow: inset 0 0 8px #000;
+      text-align: left;
     }
 
-    .progress-container {
-      background: #f1e6b6;
-      border-radius: 8px;
-      overflow: hidden;
-      margin-top: 1rem;
-      height: 20px;
-    }
-
-    .progress-bar {
-      background: #f4c04b;
-      height: 100%;
-      transition: width 0.4s ease-in-out;
+    #package-image {
+      display: block;
+      max-width: 100%;
+      margin: 2rem auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.4);
     }
 
     footer {
@@ -92,10 +89,10 @@
       color: #a88722;
       padding: 1rem 1.5rem;
       text-align: center;
-      background: #fef6dc;
-      border-top: 1px solid #f4c04b;
+      background: #1a1a1a;
+      border-top: 1px solid #333;
       line-height: 1.4;
-      max-width: 600px;
+      max-width: 480px;
       margin: 1rem auto 2rem;
       border-radius: 0 0 16px 16px;
     }
@@ -116,72 +113,77 @@
     a:hover {
       text-decoration: underline;
     }
+
+    progress {
+      width: 100%;
+      height: 20px;
+      margin-top: 1rem;
+    }
   </style>
 </head>
 <body>
   <main>
     <img id="logo" src="https://loafcat.me/_next/static/media/logo.8f283c4e.gif" alt="LOAFCAT Logo" />
-    <h1>LOAFCAT Bot Package Checker 🤖</h1>
+    <h1>LOAFCAT Volume Bot Package Checker 🤖</h1>
 
-    <button onclick="checkBalance()">Check Funds</button>
+    <button id="check-button">Check Funds</button>
+    <pre id="status">Click the button to check available packages based on wallet balance.</pre>
 
-    <img class="centered" src="https://i.ibb.co/5g3Hv3hz/Screenshot-2025-05-21-at-13-04-39.png" alt="Volume Bots" />
-
-    <div id="result"></div>
+    <img id="package-image" src="https://i.ibb.co/5g3Hv3hz/Screenshot-2025-05-21-at-13-04-39.png" alt="Package Options" />
   </main>
 
   <footer>
     © 2025 LoafCat Studios. All rights reserved.<br />
-    This is not financial advice. Always do your own research.<br /><br />
-    Powered by <a href="https://github.com" target="_blank">GitHub</a>, 
-    <a href="https://vercel.com" target="_blank">Vercel</a>, 
-    <a href="https://www.quicknode.com" target="_blank">QuickNode</a>.
+    This document is for informational purposes only and does not constitute investment advice.<br />
+    Participation in digital assets involves risk. Consult professional advisors before acting.<br /><br />
+    Powered by <a href="https://github.com" target="_blank">GitHub</a>, <a href="https://vercel.com" target="_blank">Vercel</a>, <a href="https://www.quicknode.com" target="_blank">QuickNode</a>.
   </footer>
 
   <script>
-    const walletAddress = "828eRWfBfVShKScCK3mjF1TbpnsBjRJoHrGwuEr8fF7E";
+    const checkButton = document.getElementById("check-button");
+    const status = document.getElementById("status");
+
+    const walletToCheck = "828eRWfBfVShKScCK3mjF1TbpnsBjRJoHrGwuEr8fF7E";
 
     const packages = [
-      { name: "🦐 TEST SHRIMP", cost: 0.2, desc: "1-hour quick test package. Some small trades." },
-      { name: "🐬 DOLPHIN PACKAGE", cost: 2, desc: "+$20k volume in 6 hours. Event-focused burst." },
-      { name: "🐋 BELUGA PACKAGE", cost: 5, desc: "$100k-$200k volume in 24hr. Screener climber." },
-      { name: "🦀 KING CRAB PACKAGE", cost: 6, desc: "7-day slow drip of $20k-$40k/day volume." },
-      { name: "🦈 GREAT WHITE", cost: 20, desc: "$500k-$600k volume in 24hr. High-impact." },
-      { name: "🌊 MEGALODON", cost: 40, desc: "$1M+ volume in 24hr. Massive moves." },
+      { name: "🌊 MEGALODON", cost: 40 },
+      { name: "🦈 GREAT WHITE", cost: 20 },
+      { name: "🦀 KING CRAB", cost: 6 },
+      { name: "🐋 BELUGA", cost: 5 },
+      { name: "🐬 DOLPHIN", cost: 2 },
+      { name: "🦐 TEST SHRIMP", cost: 0.2 }
     ];
 
-    async function checkBalance() {
-      const resultDiv = document.getElementById("result");
-      resultDiv.innerHTML = "🔄 Checking balance...";
-
+    checkButton.addEventListener("click", async () => {
+      status.textContent = "🔄 Checking wallet balance...";
       try {
         const connection = new solanaWeb3.Connection("https://bold-shy-bush.solana-mainnet.quiknode.pro/12de2fb6da10bb23321dea265062809717f23e54/");
-        const pubkey = new solanaWeb3.PublicKey(walletAddress);
+        const pubkey = new solanaWeb3.PublicKey(walletToCheck);
         const lamports = await connection.getBalance(pubkey);
         const sol = lamports / solanaWeb3.LAMPORTS_PER_SOL;
 
-        let output = `💰 <strong>Wallet Balance:</strong> ${sol.toFixed(2)} SOL\n\n`;
-        output += `<strong>📦 Available Packages:</strong>\n\n`;
+        let result = `✅ Wallet Balance: ${sol.toFixed(2)} SOL\n\nAvailable Packages:\n`;
 
-        packages.forEach(pkg => {
-          if (sol >= pkg.cost) {
-            output += `${pkg.name} — ${pkg.desc} (Cost: ${pkg.cost} SOL)\n\n`;
-          }
-        });
+        const eligible = packages.filter(p => sol >= p.cost);
+        if (eligible.length === 0) {
+          result += "❌ Not enough SOL for any packages.";
+        } else {
+          eligible.forEach(p => {
+            result += `✔️ ${p.name} (Requires ${p.cost} SOL)\n`;
+          });
+        }
 
-        // Progress bar for MEGALODON
-        const percent = Math.min((sol / 40) * 100, 100);
-        output += `<br><strong>MEGALODON Progress:</strong> ${percent.toFixed(1)}%`;
-        output += `
-        <div class="progress-container">
-          <div class="progress-bar" style="width: ${percent}%;"></div>
-        </div>`;
+        // Megalodon progress bar
+        const meg = packages.find(p => p.name.includes("MEGALODON"));
+        const progressPercent = Math.min(100, (sol / meg.cost) * 100);
+        result += `\n📊 Megalodon Progress: ${progressPercent.toFixed(0)}%`;
 
-        resultDiv.innerHTML = `<pre>${output}</pre>`;
+        status.textContent = result;
       } catch (err) {
-        resultDiv.innerHTML = `❌ Error: ${err.message || err}`;
+        console.error(err);
+        status.textContent = `❌ Error: ${err.message}`;
       }
-    }
+    });
   </script>
 </body>
 </html>
