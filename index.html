@@ -13,7 +13,7 @@
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: radial-gradient(circle at center, #1e1e1e, #111);
+      background: radial-gradient(circle, #1e1e1e 0%, #121212 100%);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -23,11 +23,11 @@
 
     main {
       max-width: 480px;
-      background: #2b2b2b;
+      background: #1e1e1e;
       margin: 2rem auto;
       padding: 2rem 2.5rem;
       border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
       text-align: center;
     }
 
@@ -42,10 +42,9 @@
       font-size: 2rem;
       margin-bottom: 1rem;
       color: #f4c04b;
-      text-shadow: 0 1px 3px rgba(180, 140, 10, 0.7);
     }
 
-    button {
+    button#check-button {
       background-color: #f4c04b;
       color: #3e2e00;
       border: none;
@@ -55,49 +54,73 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
       box-shadow: 0 4px 12px rgba(244, 192, 75, 0.5);
-      margin: 1.5rem auto;
+      margin-bottom: 1.5rem;
       width: 100%;
+      max-width: 320px;
       font-weight: 700;
       letter-spacing: 0.05em;
     }
 
-    button:hover {
+    button#check-button:hover {
       background-color: #d9a722;
     }
 
     pre#status {
-      background: #3a3a3a;
-      padding: 1rem;
+      background: #2a2a2a;
+      padding: 1rem 1.2rem;
       border-radius: 10px;
-      color: #fff;
+      color: #f4c04b;
       font-size: 1rem;
       text-align: left;
       min-height: 6rem;
+      overflow-wrap: break-word;
       white-space: pre-wrap;
-      box-shadow: inset 0 0 5px #f4c04baa;
+      box-shadow: inset 0 0 5px #f4c04b88;
       user-select: text;
+      max-width: 100%;
+      margin: 0 auto 1rem auto;
     }
 
-    .progress {
-      background: #555;
-      border-radius: 20px;
-      overflow: hidden;
-      margin: 1.2rem auto;
-      height: 30px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+    .progress-container {
+      margin-top: 2rem;
+      text-align: left;
+    }
+
+    .progress-container h3 {
+      margin-bottom: 0.5rem;
+      color: #f4c04b;
+      font-size: 1.1rem;
     }
 
     .progress-bar {
+      width: 100%;
+      background: #333;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 25px;
+      box-shadow: inset 0 0 5px #000;
+    }
+
+    .progress-fill {
       height: 100%;
-      background-color: #f4c04b;
-      width: 0%;
-      line-height: 30px;
+      background: linear-gradient(90deg, #f4c04b, #d9a722);
       text-align: center;
+      line-height: 25px;
       font-weight: bold;
-      color: #000;
-      transition: width 0.5s ease;
+      color: #3e2e00;
+    }
+
+    .funds-text {
+      margin-top: 2rem;
+      font-size: 0.95rem;
+      color: #f4c04b;
+    }
+
+    img#bottom-image {
+      display: block;
+      margin: 1.5rem auto;
+      max-width: 90%;
+      height: auto;
     }
 
     footer {
@@ -105,17 +128,19 @@
       color: #cbb251;
       padding: 1rem 1.5rem;
       text-align: center;
-      background: #1e1e1e;
+      background: #1a1a1a;
       border-top: 1px solid #333;
+      line-height: 1.4;
+      max-width: 480px;
+      margin: 1rem auto 2rem;
+      border-radius: 0 0 16px 16px;
     }
 
-    a {
+    footer small {
+      display: block;
+      margin-top: 0.5rem;
+      font-style: italic;
       color: #f4c04b;
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
     }
   </style>
 </head>
@@ -123,66 +148,72 @@
   <main>
     <img id="logo" src="https://loafcat.me/_next/static/media/logo.8f283c4e.gif" alt="LOAFCAT Logo" />
     <h1>LOAFCAT Volume Bot Package Checker 🤖</h1>
-    <button id="check-funds">Check Funds</button>
-    <pre id="status">Click the button to check balance and eligible packages.</pre>
-    <div class="progress">
-      <div class="progress-bar" id="megalodon-bar">0%</div>
-    </div>
-  </main>
+    <button id="check-button">Check funds</button>
+    <pre id="status"></pre>
 
-  <div style="text-align: center; margin: 2rem auto; max-width: 480px;">
-    <img src="https://i.ibb.co/5g3Hv3hz/Screenshot-2025-05-21-at-13-04-39.png" alt="Volume Bot Demo" style="width: 100%; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); margin-bottom: 1rem;" />
-    <p style="color: #f4c04b; font-size: 1rem; font-weight: 500;">
+    <div class="progress-container">
+      <h3>Megalodon Progress</h3>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill">0%</div>
+      </div>
+    </div>
+
+    <p class="funds-text">
       You can send your funds to:<br>
-      <span style="color: #fff; font-family: monospace;">828eRWfBfVShKScCK3mjF1TbpnsBjRJoHrGwuEr8fF7E</span><br>
-      or contact <a href="https://t.me/tobinbellsaw" target="_blank">@TobinBellSaw</a> on Telegram.
+      <strong>828eRWfBfVShKScCK3mjF1TbpnsBjRJoHrGwuEr8fF7E</strong><br>
+      or contact <strong>@TobinBellSaw</strong> on Telegram.
     </p>
-  </div>
+
+    <img id="bottom-image" src="https://i.ibb.co/5g3Hv3hz/Screenshot-2025-05-21-at-13-04-39.png" alt="Bot Packages" />
+  </main>
 
   <footer>
     © 2025 LoafCat Studios. All rights reserved.<br />
-    This is not financial advice. Interact responsibly.<br /><br />
-    Powered by <a href="https://github.com" target="_blank">GitHub</a>, <a href="https://vercel.com" target="_blank">Vercel</a>, <a href="https://www.quicknode.com" target="_blank">QuickNode</a>.
+    This document is for informational purposes only and does not constitute investment advice, an offer, or a solicitation to buy or sell any financial instrument.<br />
+    Participation in digital assets involves significant risk. Past performance is not indicative of future results.<br />
+    Prospective participants should conduct their own due diligence and consult with professional advisors before making any investment decisions.<br /><br />
+    Powered by <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>, <a href="https://vercel.com" target="_blank" rel="noopener noreferrer">Vercel</a>, <a href="https://www.quicknode.com" target="_blank" rel="noopener noreferrer">QuickNode</a>.
   </footer>
 
   <script>
-    const button = document.getElementById("check-funds");
-    const status = document.getElementById("status");
-    const progressBar = document.getElementById("megalodon-bar");
-    const WALLET = "828eRWfBfVShKScCK3mjF1TbpnsBjRJoHrGwuEr8fF7E";
-    const RPC = "https://bold-shy-bush.solana-mainnet.quiknode.pro/12de2fb6da10bb23321dea265062809717f23e54/";
+    const checkButton = document.getElementById("check-button");
+    const statusText = document.getElementById("status");
+    const progressFill = document.getElementById("progress-fill");
 
-    const packages = [
-      { name: "MEGALODON", cost: 40 },
-      { name: "GREAT WHITE", cost: 20 },
-      { name: "KING CRAB", cost: 6 },
-      { name: "BELUGA", cost: 5 },
-      { name: "DOLPHIN", cost: 2 },
-      { name: "TEST SHRIMP", cost: 0.2 }
-    ];
+    const WALLET_TO_CHECK = "828eRWfBfVShKScCK3mjF1TbpnsBjRJoHrGwuEr8fF7E";
+    const RPC_URL = "https://bold-shy-bush.solana-mainnet.quiknode.pro/12de2fb6da10bb23321dea265062809717f23e54/";
 
-    button.addEventListener("click", async () => {
+    checkButton.addEventListener("click", async () => {
       try {
-        status.textContent = "Checking SOL balance...";
-        const conn = new solanaWeb3.Connection(RPC, "confirmed");
-        const pubkey = new solanaWeb3.PublicKey(WALLET);
-        const lamports = await conn.getBalance(pubkey);
-        const sol = lamports / solanaWeb3.LAMPORTS_PER_SOL;
-        status.textContent = `Wallet balance: ${sol.toFixed(2)} SOL\n\nAvailable Packages:`;
+        statusText.textContent = "🔍 Checking wallet balance...";
+        const connection = new solanaWeb3.Connection(RPC_URL, "confirmed");
+        const publicKey = new solanaWeb3.PublicKey(WALLET_TO_CHECK);
+        const balanceLamports = await connection.getBalance(publicKey);
+        const balanceSOL = balanceLamports / solanaWeb3.LAMPORTS_PER_SOL;
+
+        statusText.textContent = `💰 Current Balance: ${balanceSOL.toFixed(2)} SOL\n\nAvailable Packages:`;
+
+        const packages = [
+          { name: "TEST SHRIMP", cost: 0.2 },
+          { name: "DOLPHIN", cost: 2 },
+          { name: "BELUGA", cost: 5 },
+          { name: "KING CRAB", cost: 6 },
+          { name: "GREAT WHITE", cost: 20 },
+          { name: "MEGALODON", cost: 40 }
+        ];
 
         packages.forEach(pkg => {
-          if (sol >= pkg.cost) {
-            status.textContent += `\n✅ ${pkg.name} Package (${pkg.cost} SOL)`;
+          if (balanceSOL >= pkg.cost) {
+            statusText.textContent += `\n✅ ${pkg.name} PACKAGE available (Cost: ${pkg.cost} SOL)`;
           }
         });
 
-        const progress = Math.min((sol / 40) * 100, 100);
-        progressBar.style.width = `${progress}%`;
-        progressBar.textContent = `${Math.floor(progress)}% to MEGALODON`;
-
-      } catch (e) {
-        status.textContent = `❌ Error: ${e.message}`;
-        console.error(e);
+        const progress = Math.min((balanceSOL / 40) * 100, 100);
+        progressFill.style.width = progress + "%";
+        progressFill.textContent = progress.toFixed(0) + "%";
+      } catch (err) {
+        console.error(err);
+        statusText.textContent = `❌ Error: ${err.message}`;
       }
     });
   </script>
