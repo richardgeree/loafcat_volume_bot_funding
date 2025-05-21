@@ -2,143 +2,186 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Volfied Clone</title>
+  <title>LOAFCAT Bot Checker</title>
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
   <style>
-    html, body {
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #fef6dc, #f9f1d3);
+      color: #6b5b1a;
       margin: 0;
       padding: 0;
-      background: black;
-      overflow: hidden;
+      text-align: center;
     }
-    canvas {
+
+    main {
+      max-width: 600px;
+      margin: 2rem auto;
+      background: #ffffffcc;
+      padding: 2rem 2.5rem;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(244, 192, 75, 0.3);
+    }
+
+    img#logo {
       display: block;
-      background: #111;
+      margin: 0 auto 1rem;
+      width: 150px;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+      color: #f4c04b;
+      text-shadow: 0 1px 3px rgba(180, 140, 10, 0.7);
+    }
+
+    button {
+      background-color: #f4c04b;
+      color: #3e2e00;
+      border: none;
+      border-radius: 8px;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 12px rgba(244, 192, 75, 0.5);
+    }
+
+    button:hover {
+      background-color: #d9a722;
+    }
+
+    img.centered {
+      display: block;
+      margin: 1rem auto 2rem;
+      max-width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    pre {
+      background: #fff8d1;
+      padding: 1rem;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      text-align: left;
+      white-space: pre-wrap;
+      box-shadow: inset 0 0 5px #f4c04baa;
+      user-select: text;
+    }
+
+    .progress-container {
+      background: #f1e6b6;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 1rem;
+      height: 20px;
+    }
+
+    .progress-bar {
+      background: #f4c04b;
+      height: 100%;
+      transition: width 0.4s ease-in-out;
+    }
+
+    footer {
+      font-size: 0.8rem;
+      color: #a88722;
+      padding: 1rem 1.5rem;
+      text-align: center;
+      background: #fef6dc;
+      border-top: 1px solid #f4c04b;
+      line-height: 1.4;
+      max-width: 600px;
+      margin: 1rem auto 2rem;
+      border-radius: 0 0 16px 16px;
+    }
+
+    footer small {
+      display: block;
+      margin-top: 0.5rem;
+      font-style: italic;
+      color: #cbb251;
+    }
+
+    a {
+      color: #f4c04b;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-<canvas id="game"></canvas>
-<script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+  <main>
+    <img id="logo" src="https://loafcat.me/_next/static/media/logo.8f283c4e.gif" alt="LOAFCAT Logo" />
+    <h1>LOAFCAT Bot Package Checker 🤖</h1>
 
-const WIDTH = canvas.width;
-const HEIGHT = canvas.height;
+    <button onclick="checkBalance()">Check Funds</button>
 
-let player = {
-  x: 10,
-  y: HEIGHT / 2,
-  w: 10,
-  h: 10,
-  speed: 4,
-  drawing: false,
-  path: []
-};
+    <img class="centered" src="https://i.ibb.co/5g3Hv3hz/Screenshot-2025-05-21-at-13-04-39.png" alt="Volume Bots" />
 
-let enemy = {
-  x: WIDTH / 2,
-  y: HEIGHT / 2,
-  vx: 2,
-  vy: 2,
-  radius: 15
-};
+    <div id="result"></div>
+  </main>
 
-let claimed = [];
+  <footer>
+    © 2025 LoafCat Studios. All rights reserved.<br />
+    This is not financial advice. Always do your own research.<br /><br />
+    Powered by <a href="https://github.com" target="_blank">GitHub</a>, 
+    <a href="https://vercel.com" target="_blank">Vercel</a>, 
+    <a href="https://www.quicknode.com" target="_blank">QuickNode</a>.
+  </footer>
 
-function drawPlayer() {
-  ctx.fillStyle = player.drawing ? "yellow" : "lime";
-  ctx.fillRect(player.x, player.y, player.w, player.h);
-}
+  <script>
+    const walletAddress = "828eRWfBfVShKScCK3mjF1TbpnsBjRJoHrGwuEr8fF7E";
 
-function drawEnemy() {
-  ctx.fillStyle = "red";
-  ctx.beginPath();
-  ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI * 2);
-  ctx.fill();
-}
+    const packages = [
+      { name: "🦐 TEST SHRIMP", cost: 0.2, desc: "1-hour quick test package. Some small trades." },
+      { name: "🐬 DOLPHIN PACKAGE", cost: 2, desc: "+$20k volume in 6 hours. Event-focused burst." },
+      { name: "🐋 BELUGA PACKAGE", cost: 5, desc: "$100k-$200k volume in 24hr. Screener climber." },
+      { name: "🦀 KING CRAB PACKAGE", cost: 6, desc: "7-day slow drip of $20k-$40k/day volume." },
+      { name: "🦈 GREAT WHITE", cost: 20, desc: "$500k-$600k volume in 24hr. High-impact." },
+      { name: "🌊 MEGALODON", cost: 40, desc: "$1M+ volume in 24hr. Massive moves." },
+    ];
 
-function moveEnemy() {
-  enemy.x += enemy.vx;
-  enemy.y += enemy.vy;
-  if (enemy.x < enemy.radius || enemy.x > WIDTH - enemy.radius) enemy.vx *= -1;
-  if (enemy.y < enemy.radius || enemy.y > HEIGHT - enemy.radius) enemy.vy *= -1;
-}
+    async function checkBalance() {
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "🔄 Checking balance...";
 
-function drawClaimed() {
-  ctx.fillStyle = "#333";
-  claimed.forEach(rect => ctx.fillRect(rect.x, rect.y, rect.w, rect.h));
-}
+      try {
+        const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com");
+        const pubkey = new solanaWeb3.PublicKey(walletAddress);
+        const lamports = await connection.getBalance(pubkey);
+        const sol = lamports / solanaWeb3.LAMPORTS_PER_SOL;
 
-function drawPath() {
-  if (player.path.length > 1) {
-    ctx.strokeStyle = "yellow";
-    ctx.beginPath();
-    ctx.moveTo(player.path[0].x, player.path[0].y);
-    for (let i = 1; i < player.path.length; i++) {
-      ctx.lineTo(player.path[i].x, player.path[i].y);
+        let output = `💰 <strong>Wallet Balance:</strong> ${sol.toFixed(2)} SOL\n\n`;
+        output += `<strong>📦 Available Packages:</strong>\n\n`;
+
+        packages.forEach(pkg => {
+          if (sol >= pkg.cost) {
+            output += `${pkg.name} — ${pkg.desc} (Cost: ${pkg.cost} SOL)\n\n`;
+          }
+        });
+
+        // Progress bar for MEGALODON
+        const percent = Math.min((sol / 40) * 100, 100);
+        output += `<br><strong>MEGALODON Progress:</strong> ${percent.toFixed(1)}%`;
+        output += `
+        <div class="progress-container">
+          <div class="progress-bar" style="width: ${percent}%;"></div>
+        </div>`;
+
+        resultDiv.innerHTML = `<pre>${output}</pre>`;
+      } catch (err) {
+        resultDiv.innerHTML = `❌ Error: ${err.message || err}`;
+      }
     }
-    ctx.stroke();
-  }
-}
-
-function checkEnemyTouchPath() {
-  return player.path.some(p => {
-    const dx = p.x - enemy.x;
-    const dy = p.y - enemy.y;
-    return Math.sqrt(dx * dx + dy * dy) < enemy.radius;
-  });
-}
-
-function claimArea() {
-  if (player.path.length > 1) {
-    let minX = Math.min(...player.path.map(p => p.x));
-    let minY = Math.min(...player.path.map(p => p.y));
-    let maxX = Math.max(...player.path.map(p => p.x));
-    let maxY = Math.max(...player.path.map(p => p.y));
-    claimed.push({ x: minX, y: minY, w: maxX - minX, h: maxY - minY });
-  }
-}
-
-function update() {
-  ctx.clearRect(0, 0, WIDTH, HEIGHT);
-  drawClaimed();
-  drawEnemy();
-  moveEnemy();
-  drawPlayer();
-  drawPath();
-
-  if (player.drawing && checkEnemyTouchPath()) {
-    alert("Game Over!");
-    document.location.reload();
-  }
-
-  requestAnimationFrame(update);
-}
-
-window.addEventListener("keydown", e => {
-  if (e.key === "ArrowUp") player.y -= player.speed;
-  if (e.key === "ArrowDown") player.y += player.speed;
-  if (e.key === "ArrowLeft") player.x -= player.speed;
-  if (e.key === "ArrowRight") player.x += player.speed;
-  if (e.key === " ") {
-    // toggle drawing
-    if (!player.drawing) {
-      player.path = [{ x: player.x, y: player.y }];
-    } else {
-      player.path.push({ x: player.x, y: player.y });
-      claimArea();
-      player.path = [];
-    }
-    player.drawing = !player.drawing;
-  }
-
-  if (player.drawing) player.path.push({ x: player.x, y: player.y });
-});
-
-update();
-</script>
+  </script>
 </body>
 </html>
