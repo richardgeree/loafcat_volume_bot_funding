@@ -13,7 +13,7 @@
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: radial-gradient(ellipse at center, #2c2c2c 0%, #1a1a1a 100%);
+      background: radial-gradient(circle at center, #1e1e1e, #111);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -23,11 +23,11 @@
 
     main {
       max-width: 480px;
-      background: #1e1e1e;
+      background: #2b2b2b;
       margin: 2rem auto;
       padding: 2rem 2.5rem;
       border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
       text-align: center;
     }
 
@@ -42,10 +42,10 @@
       font-size: 2rem;
       margin-bottom: 1rem;
       color: #f4c04b;
-      text-shadow: 0 1px 3px rgba(255, 255, 255, 0.2);
+      text-shadow: 0 1px 3px rgba(180, 140, 10, 0.7);
     }
 
-    button#check-button {
+    button {
       background-color: #f4c04b;
       color: #3e2e00;
       border: none;
@@ -55,69 +55,67 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
       box-shadow: 0 4px 12px rgba(244, 192, 75, 0.5);
-      margin: 1.5rem 0;
-      font-weight: 700;
+      margin: 1.5rem auto;
       width: 100%;
-      max-width: 320px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
     }
 
-    button#check-button:hover {
+    button:hover {
       background-color: #d9a722;
     }
 
     pre#status {
-      background: #2a2a2a;
+      background: #3a3a3a;
       padding: 1rem;
       border-radius: 10px;
-      color: #fef6dc;
+      color: #fff;
       font-size: 1rem;
-      white-space: pre-wrap;
-      box-shadow: inset 0 0 8px #000;
       text-align: left;
+      min-height: 6rem;
+      white-space: pre-wrap;
+      box-shadow: inset 0 0 5px #f4c04baa;
+      user-select: text;
     }
 
-    #package-image {
-      display: block;
-      max-width: 100%;
-      margin: 2rem auto;
-      border-radius: 12px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.4);
+    .progress {
+      background: #555;
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 1.2rem auto;
+      height: 30px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+    }
+
+    .progress-bar {
+      height: 100%;
+      background-color: #f4c04b;
+      width: 0%;
+      line-height: 30px;
+      text-align: center;
+      font-weight: bold;
+      color: #000;
+      transition: width 0.5s ease;
     }
 
     footer {
       font-size: 0.8rem;
-      color: #a88722;
+      color: #cbb251;
       padding: 1rem 1.5rem;
       text-align: center;
-      background: #1a1a1a;
+      background: #1e1e1e;
       border-top: 1px solid #333;
-      line-height: 1.4;
-      max-width: 480px;
-      margin: 1rem auto 2rem;
-      border-radius: 0 0 16px 16px;
-    }
-
-    footer small {
-      display: block;
-      margin-top: 0.5rem;
-      font-style: italic;
-      color: #cbb251;
     }
 
     a {
       color: #f4c04b;
       text-decoration: none;
-      font-weight: 600;
     }
 
     a:hover {
       text-decoration: underline;
-    }
-
-    progress {
-      width: 100%;
-      height: 20px;
-      margin-top: 1rem;
     }
   </style>
 </head>
@@ -125,63 +123,66 @@
   <main>
     <img id="logo" src="https://loafcat.me/_next/static/media/logo.8f283c4e.gif" alt="LOAFCAT Logo" />
     <h1>LOAFCAT Volume Bot Package Checker 🤖</h1>
-
-    <button id="check-button">Check Funds</button>
-    <pre id="status">Click the button to check available packages based on wallet balance.</pre>
-
-    <img id="package-image" src="https://i.ibb.co/5g3Hv3hz/Screenshot-2025-05-21-at-13-04-39.png" alt="Package Options" />
+    <button id="check-funds">Check Funds</button>
+    <pre id="status">Click the button to check balance and eligible packages.</pre>
+    <div class="progress">
+      <div class="progress-bar" id="megalodon-bar">0%</div>
+    </div>
   </main>
+
+  <div style="text-align: center; margin: 2rem auto; max-width: 480px;">
+    <img src="https://i.ibb.co/5g3Hv3hz/Screenshot-2025-05-21-at-13-04-39.png" alt="Volume Bot Demo" style="width: 100%; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); margin-bottom: 1rem;" />
+    <p style="color: #f4c04b; font-size: 1rem; font-weight: 500;">
+      You can send your funds to:<br>
+      <span style="color: #fff; font-family: monospace;">828eRWfBfVShKScCK3mjF1TbpnsBjRJoHrGwuEr8fF7E</span><br>
+      or contact <a href="https://t.me/tobinbellsaw" target="_blank">@TobinBellSaw</a> on Telegram.
+    </p>
+  </div>
 
   <footer>
     © 2025 LoafCat Studios. All rights reserved.<br />
-    This document is for informational purposes only and does not constitute investment advice.<br />
-    Participation in digital assets involves risk. Consult professional advisors before acting.<br /><br />
+    This is not financial advice. Interact responsibly.<br /><br />
     Powered by <a href="https://github.com" target="_blank">GitHub</a>, <a href="https://vercel.com" target="_blank">Vercel</a>, <a href="https://www.quicknode.com" target="_blank">QuickNode</a>.
   </footer>
 
   <script>
-    const checkButton = document.getElementById("check-button");
+    const button = document.getElementById("check-funds");
     const status = document.getElementById("status");
-
-    const walletToCheck = "828eRWfBfVShKScCK3mjF1TbpnsBjRJoHrGwuEr8fF7E";
+    const progressBar = document.getElementById("megalodon-bar");
+    const WALLET = "828eRWfBfVShKScCK3mjF1TbpnsBjRJoHrGwuEr8fF7E";
+    const RPC = "https://bold-shy-bush.solana-mainnet.quiknode.pro/12de2fb6da10bb23321dea265062809717f23e54/";
 
     const packages = [
-      { name: "🌊 MEGALODON", cost: 40 },
-      { name: "🦈 GREAT WHITE", cost: 20 },
-      { name: "🦀 KING CRAB", cost: 6 },
-      { name: "🐋 BELUGA", cost: 5 },
-      { name: "🐬 DOLPHIN", cost: 2 },
-      { name: "🦐 TEST SHRIMP", cost: 0.2 }
+      { name: "MEGALODON", cost: 40 },
+      { name: "GREAT WHITE", cost: 20 },
+      { name: "KING CRAB", cost: 6 },
+      { name: "BELUGA", cost: 5 },
+      { name: "DOLPHIN", cost: 2 },
+      { name: "TEST SHRIMP", cost: 0.2 }
     ];
 
-    checkButton.addEventListener("click", async () => {
-      status.textContent = "🔄 Checking wallet balance...";
+    button.addEventListener("click", async () => {
       try {
-        const connection = new solanaWeb3.Connection("https://bold-shy-bush.solana-mainnet.quiknode.pro/12de2fb6da10bb23321dea265062809717f23e54/");
-        const pubkey = new solanaWeb3.PublicKey(walletToCheck);
-        const lamports = await connection.getBalance(pubkey);
+        status.textContent = "Checking SOL balance...";
+        const conn = new solanaWeb3.Connection(RPC, "confirmed");
+        const pubkey = new solanaWeb3.PublicKey(WALLET);
+        const lamports = await conn.getBalance(pubkey);
         const sol = lamports / solanaWeb3.LAMPORTS_PER_SOL;
+        status.textContent = `Wallet balance: ${sol.toFixed(2)} SOL\n\nAvailable Packages:`;
 
-        let result = `✅ Wallet Balance: ${sol.toFixed(2)} SOL\n\nAvailable Packages:\n`;
+        packages.forEach(pkg => {
+          if (sol >= pkg.cost) {
+            status.textContent += `\n✅ ${pkg.name} Package (${pkg.cost} SOL)`;
+          }
+        });
 
-        const eligible = packages.filter(p => sol >= p.cost);
-        if (eligible.length === 0) {
-          result += "❌ Not enough SOL for any packages.";
-        } else {
-          eligible.forEach(p => {
-            result += `✔️ ${p.name} (Requires ${p.cost} SOL)\n`;
-          });
-        }
+        const progress = Math.min((sol / 40) * 100, 100);
+        progressBar.style.width = `${progress}%`;
+        progressBar.textContent = `${Math.floor(progress)}% to MEGALODON`;
 
-        // Megalodon progress bar
-        const meg = packages.find(p => p.name.includes("MEGALODON"));
-        const progressPercent = Math.min(100, (sol / meg.cost) * 100);
-        result += `\n📊 Megalodon Progress: ${progressPercent.toFixed(0)}%`;
-
-        status.textContent = result;
-      } catch (err) {
-        console.error(err);
-        status.textContent = `❌ Error: ${err.message}`;
+      } catch (e) {
+        status.textContent = `❌ Error: ${e.message}`;
+        console.error(e);
       }
     });
   </script>
