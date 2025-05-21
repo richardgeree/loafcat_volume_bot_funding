@@ -155,7 +155,7 @@
       resultDiv.innerHTML = "🔄 Checking balance...";
 
       try {
-        const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com");
+        const connection = new solanaWeb3.Connection("https://bold-shy-bush.solana-mainnet.quiknode.pro/12de2fb6da10bb23321dea265062809717f23e54/");
         const pubkey = new solanaWeb3.PublicKey(walletAddress);
         const lamports = await connection.getBalance(pubkey);
         const sol = lamports / solanaWeb3.LAMPORTS_PER_SOL;
