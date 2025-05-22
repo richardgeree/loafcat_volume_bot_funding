@@ -152,7 +152,7 @@
     <pre id="status"></pre>
 
     <div class="progress-container">
-      <h3>Megalodon Progress</h3>
+      <h3>King Crab Progress</h3>
       <div class="progress-bar">
         <div class="progress-fill" id="progress-fill">0%</div>
       </div>
@@ -191,7 +191,7 @@
         const balanceLamports = await connection.getBalance(publicKey);
         const balanceSOL = balanceLamports / solanaWeb3.LAMPORTS_PER_SOL;
 
-        statusText.textContent = `💰 Current Balance: ${balanceSOL.toFixed(2)} SOL\n\nAvailable Packages:`;
+        statusText.innerHTML = `💰 Current Balance: ${balanceSOL.toFixed(2)} SOL\n\nAvailable Packages:`;
 
         const packages = [
           { name: "TEST SHRIMP", cost: 0.2 },
@@ -203,12 +203,14 @@
         ];
 
         packages.forEach(pkg => {
-          if (balanceSOL >= pkg.cost) {
-            statusText.textContent += `\n✅ ${pkg.name} PACKAGE available (Cost: ${pkg.cost} SOL)`;
-          }
-        });
+        const canAfford = balanceSOL >= pkg.cost;
+        const statusIcon = canAfford ? "✅" : "❌";
+        const color = canAfford ? "#4caf50" : "#ff4c4c"; // green or red
 
-        const progress = Math.min((balanceSOL / 40) * 100, 100);
+  statusText.innerHTML += `<span style="color: ${color};">${statusIcon} ${pkg.name} PACKAGE</span> (Cost: ${pkg.cost} SOL)\n`;
+});
+
+        const progress = Math.min((balanceSOL / 6) * 100, 100);
         progressFill.style.width = progress + "%";
         progressFill.textContent = progress.toFixed(0) + "%";
       } catch (err) {
