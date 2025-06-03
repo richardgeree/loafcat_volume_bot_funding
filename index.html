@@ -152,7 +152,7 @@
     <pre id="status"></pre>
 
     <div class="progress-container">
-      <h3>King Crab Progress:</h3>
+      <h3>Beluga Package Progress:</h3>
       <div class="progress-bar">
         <div class="progress-fill" id="progress-fill">0%</div>
       </div>
@@ -263,7 +263,7 @@
   statusText.innerHTML += `<span style="color: ${color};">${statusIcon} ${pkg.name} PACKAGE</span> (Cost: ${pkg.cost} SOL)\n`;
 });
 
-        const progress = Math.min((balanceSOL / 6) * 100, 100);
+        const progress = Math.min((balanceSOL / 5) * 100, 100);
         progressFill.style.width = progress + "%";
         progressFill.textContent = progress.toFixed(0) + "%";
       } catch (err) {
