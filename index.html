@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <title>LOAFCAT Volume Bot Funding 🤖</title>
-  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -258,78 +257,82 @@
 
   <script>
   const checkButton = document.getElementById("check-button");
-  const statusText = document.getElementById("status");
+  const statusText  = document.getElementById("status");
   const progressFill = document.getElementById("progress-fill");
 
-  const WALLET_TO_CHECK = "828eRWfBfVShKScCK3mjF1TbpnsBjRJoHrGwuEr8fF7E";
+  const ADDRESS = "828eRWfBfVShKScCK3mjF1TbpnsBjRJoHrGwuEr8fF7E";
 
-  // Fallback RPCs (you can keep your QuickNode last)
-  const RPC_LIST = [
-    "https://rpc.ankr.com/solana",
-    "https://api.mainnet-beta.solana.com",
-    "https://solana-mainnet.public.blastapi.io",
-    "https://solana--mainnet.data.onfinality.io/public",
-    "https://bold-shy-bush.solana-mainnet.quiknode.pro/12de2fb6da10bb23321dea265062809717f23e54/"
+  // Two public Solscan endpoints (one will usually work). No RPC keys needed.
+  const SOLSCAN_ENDPOINTS = [
+    `https://public-api.solscan.io/account/${ADDRESS}`,
+    `https://api.solscan.io/account?address=${ADDRESS}`
   ];
 
-  async function getBalanceWithFallback(pubkey) {
+  function parseSolscanBalance(json) {
+    if (!json) return null;
+    if (typeof json.lamports === "number") return json.lamports / 1e9;                 // v2 shape
+    if (typeof json.solBalance === "number") return json.solBalance;                   // flat
+    if (json.data && typeof json.data.solBalance === "number") return json.data.solBalance; // legacy
+    if (json.data && typeof json.data.lamports === "number") return json.data.lamports / 1e9;
+    return null;
+  }
+
+  async function fetchSolFromSolscan() {
     let lastErr;
-    for (const url of RPC_LIST) {
+    for (const url of SOLSCAN_ENDPOINTS) {
       try {
-        const conn = new solanaWeb3.Connection(url, "confirmed");
-        const lamports = await conn.getBalance(pubkey);
-        return { lamports, rpcUsed: url };
-      } catch (e) {
-        lastErr = e;
-      }
+        const res = await fetch(url, { headers: { "accept": "application/json" }});
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const sol = parseSolscanBalance(data);
+        if (sol == null) throw new Error("Unexpected API shape");
+        return { sol, url };
+      } catch (e) { lastErr = e; }
     }
-    throw lastErr || new Error("All RPCs failed");
+    throw lastErr || new Error("All Solscan endpoints failed");
   }
 
   checkButton.addEventListener("click", async () => {
+    statusText.innerHTML = "🔍 Fetching from Solscan…";
     try {
-      statusText.innerHTML = "🔍 Checking wallet balance…";
-      const publicKey = new solanaWeb3.PublicKey(WALLET_TO_CHECK);
+      const { sol, url } = await fetchSolFromSolscan();
 
-      const { lamports, rpcUsed } = await getBalanceWithFallback(publicKey);
-      const balanceSOL = lamports / solanaWeb3.LAMPORTS_PER_SOL;
-
-      // Use <br> with innerHTML (not \n)
       statusText.innerHTML =
-        `💰 Current Balance: ${balanceSOL.toFixed(2)} SOL<br>` +
-        `<small style="opacity:.8">RPC: ${rpcUsed}</small><br><br>` +
+        `💰 Current Balance: ${sol.toFixed(9)} SOL<br>` +
+        `<small style="opacity:.8">Source: ${new URL(url).hostname}</small><br><br>` +
         `Available Packages:<br>`;
 
       const packages = [
-        { name: "FUGU",       cost: 2 },
-        { name: "DOLPHIN",    cost: 2 },
-        { name: "BELUGA",     cost: 5 },
-        { name: "KING CRAB",  cost: 6 },
-        { name: "GREAT WHITE",cost: 20 },
-        { name: "MEGALODON",  cost: 40 },
-        { name: "TEST SHRIMP",cost: 0.2 }
+        { name: "TEST SHRIMP", cost: 0.2 },
+        { name: "FUGU",        cost: 2 },
+        { name: "DOLPHIN",     cost: 2 },
+        { name: "BELUGA",      cost: 5 },
+        { name: "KING CRAB",   cost: 6 },
+        { name: "GREAT WHITE", cost: 20 },
+        { name: "MEGALODON",   cost: 40 }
       ];
 
-      packages.forEach(pkg => {
-        const canAfford = balanceSOL >= pkg.cost;
-        const icon = canAfford ? "✅" : "❌";
-        const color = canAfford ? "#4caf50" : "#ff4c4c";
+      packages.forEach(p => {
+        const ok = sol >= p.cost;
+        const icon = ok ? "✅" : "❌";
+        const color = ok ? "#4caf50" : "#ff4c4c";
         statusText.innerHTML +=
-          `<span style="color:${color}">${icon} ${pkg.name} PACKAGE</span> (Cost: ${pkg.cost} SOL)<br>`;
+          `<span style="color:${color}">${icon} ${p.name} PACKAGE</span> (Cost: ${p.cost} SOL)<br>`;
       });
 
       // Progress toward KING CRAB (6 SOL)
-      const progress = Math.min((balanceSOL / 6) * 100, 100);
+      const progress = Math.min((sol / 6) * 100, 100);
       progressFill.style.width = progress + "%";
       progressFill.textContent = progress.toFixed(0) + "%";
     } catch (err) {
       statusText.innerHTML =
-        `❌ Error: ${err?.message || err}<br>` +
-        `<small>Likely RPC credits exhausted, CORS blocked, or network issue. Try another RPC or check QuickNode billing/security.</small>`;
+        `❌ Error: ${err.message || err}<br>` +
+        `<small>Likely CORS or Solscan rate-limit. If it persists, use a free RPC (e.g. rpc.ankr.com/solana) or a tiny proxy.</small>`;
       console.error(err);
     }
   });
 </script>
+
 
 </body>
 </html>
