@@ -263,15 +263,13 @@
 
   const ADDRESS = "828eRWfBfVShKScCK3mjF1TbpnsBjRJoHrGwuEr8fF7E";
 
-  // Free public RPCs (browser-friendly)
+  // Your Helius endpoint (keyed, stable)
   const RPCS = [
-    "https://rpc.ankr.com/solana",
-    "https://api.mainnet-beta.solana.com",
-    "https://solana-mainnet.public.blastapi.io",
-    "https://solana--mainnet.data.onfinality.io/public"
+    "https://mainnet.helius-rpc.com/?api-key=264a4f87-2b99-43f3-a5d1-10f8e6af5000",
+    "https://solana.api.onfinality.io/public" // fallback
   ];
 
-  async function getBalanceViaJSONRPC(addr) {
+  async function getBalance(addr) {
     const payload = {
       jsonrpc: "2.0",
       id: 1,
@@ -286,11 +284,10 @@
           headers: { "content-type": "application/json" },
           body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status} @ ${new URL(url).hostname}`);
         const j = await res.json();
-        if (j.error) throw new Error(`${j.error.message} @ ${new URL(url).hostname}`);
+        if (!res.ok || j.error) throw new Error((j.error && j.error.message) || `HTTP ${res.status}`);
         const lamports = j.result?.value;
-        if (typeof lamports !== "number") throw new Error(`Bad payload @ ${new URL(url).hostname}`);
+        if (typeof lamports !== "number") throw new Error("Bad payload");
         return { sol: lamports / 1e9, rpc: url };
       } catch (e) { lastErr = e; }
     }
@@ -300,7 +297,7 @@
   checkButton.addEventListener("click", async () => {
     statusText.innerHTML = "🔍 Checking wallet balance…";
     try {
-      const { sol, rpc } = await getBalanceViaJSONRPC(ADDRESS);
+      const { sol, rpc } = await getBalance(ADDRESS);
 
       statusText.innerHTML =
         `💰 Current Balance: ${sol.toFixed(9)} SOL<br>` +
@@ -334,7 +331,6 @@
     }
   });
 </script>
-
 
 </body>
 </html>
