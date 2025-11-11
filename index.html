@@ -256,27 +256,42 @@
     Powered by <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>, <a href="https://vercel.com" target="_blank" rel="noopener noreferrer">Vercel</a>, <a href="https://www.quicknode.com" target="_blank" rel="noopener noreferrer">QuickNode</a>.
   </footer>
 
- <script>
-  const checkButton = document.getElementById("check-button");
-  const statusText  = document.getElementById("status");
+<script>
+  const checkButton  = document.getElementById("check-button");
+  const statusText   = document.getElementById("status");
   const progressFill = document.getElementById("progress-fill");
 
-  const WALLET = "828eRWfBfVShKScCK3mjF1TbpnsBjRJoHrGwuEr8fF7E";
+  const ADDRESS = "828eRWfBfVShKScCK3mjF1TbpnsBjRJoHrGwuEr8fF7E";
 
-  const RPC_LIST = [
+  // Free public RPCs (browser-friendly)
+  const RPCS = [
     "https://rpc.ankr.com/solana",
     "https://api.mainnet-beta.solana.com",
     "https://solana-mainnet.public.blastapi.io",
     "https://solana--mainnet.data.onfinality.io/public"
   ];
 
-  async function getBalance(publicKey) {
+  async function getBalanceViaJSONRPC(addr) {
+    const payload = {
+      jsonrpc: "2.0",
+      id: 1,
+      method: "getBalance",
+      params: [addr, { commitment: "confirmed" }]
+    };
     let lastErr;
-    for (const url of RPC_LIST) {
+    for (const url of RPCS) {
       try {
-        const conn = new solanaWeb3.Connection(url, "confirmed");
-        const lamports = await conn.getBalance(publicKey);
-        return { lamports, url };
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status} @ ${new URL(url).hostname}`);
+        const j = await res.json();
+        if (j.error) throw new Error(`${j.error.message} @ ${new URL(url).hostname}`);
+        const lamports = j.result?.value;
+        if (typeof lamports !== "number") throw new Error(`Bad payload @ ${new URL(url).hostname}`);
+        return { sol: lamports / 1e9, rpc: url };
       } catch (e) { lastErr = e; }
     }
     throw lastErr || new Error("All RPCs failed");
@@ -285,13 +300,11 @@
   checkButton.addEventListener("click", async () => {
     statusText.innerHTML = "🔍 Checking wallet balance…";
     try {
-      const pk = new solanaWeb3.PublicKey(WALLET);
-      const { lamports, url } = await getBalance(pk);
-      const sol = lamports / solanaWeb3.LAMPORTS_PER_SOL;
+      const { sol, rpc } = await getBalanceViaJSONRPC(ADDRESS);
 
       statusText.innerHTML =
         `💰 Current Balance: ${sol.toFixed(9)} SOL<br>` +
-        `<small style="opacity:.8">RPC: ${new URL(url).hostname}</small><br><br>` +
+        `<small style="opacity:.8">RPC: ${new URL(rpc).hostname}</small><br><br>` +
         `Available Packages:<br>`;
 
       const packages = [
@@ -311,7 +324,7 @@
         statusText.innerHTML += `<span style="color:${color}">${icon} ${p.name} PACKAGE</span> (Cost: ${p.cost} SOL)<br>`;
       });
 
-      // Progress to King Crab (6 SOL)
+      // Progress to KING CRAB (6 SOL)
       const progress = Math.min((sol / 6) * 100, 100);
       progressFill.style.width = progress + "%";
       progressFill.textContent = progress.toFixed(0) + "%";
@@ -321,6 +334,7 @@
     }
   });
 </script>
+
 
 </body>
 </html>
